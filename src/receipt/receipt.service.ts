@@ -43,4 +43,27 @@ export class ReceiptService {
     console.log(`[DB]: Retrieved ${receipts.length} receipts for user ${userId}`);
     return receipts;
   }
+
+  async updateReceipt(
+    id: string, 
+    data: Partial<ReceiptEntity>
+  ): Promise<ReceiptEntity> {
+    
+    // 1. Find the receipt to ensure it exists
+    const receipt = await this.receiptRepository.findOne({ where: { id } });
+    
+    if (!receipt) {
+        // You might use a custom NotFoundException here, but we'll throw a standard error for now
+        throw new Error(`Receipt with ID ${id} not found.`);
+    }
+
+    // 2. Merge the new data onto the existing entity
+    const updatedReceipt = this.receiptRepository.merge(receipt, data);
+
+    // 3. Save the merged entity (TypeORM performs an UPDATE automatically)
+    const result = await this.receiptRepository.save(updatedReceipt);
+
+    console.log(`[DB]: Successfully updated Receipt ID: ${id}`);
+    return result;
+  }
 }

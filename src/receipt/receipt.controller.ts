@@ -1,6 +1,6 @@
 // spendsnap-backend/src/receipt/receipt.controller.ts
 
-import { Controller, Get, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Query } from '@nestjs/common';
 import { ReceiptService } from './receipt.service';
 import { ReceiptEntity } from './receipt.entity';
 
@@ -19,5 +19,16 @@ export class ReceiptController {
         }
 
         return this.receiptService.findAllByUser(userId);
+    }
+
+    @Patch(':id')
+    async update(
+        @Param('id') id: string, // Get the ID from the URL path
+        @Body() updateData: Partial<ReceiptEntity> // Get the update fields from the body
+    ): Promise<ReceiptEntity> {
+        
+        // Note: For production, you should validate that the user owns this receipt ID here.
+        
+        return this.receiptService.updateReceipt(id, updateData);
     }
 }
